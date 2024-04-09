@@ -1,0 +1,54 @@
+﻿@page "/load-partial"
+@using VirtualizationSample.Models;
+
+<h3>LoadPartialData</h3>
+<div style="height:500px;overflow-y:scroll">
+    <table>
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Summary</th>
+            </tr>
+        </thead>
+        <tbody>
+            <Virtualize Context="item" ItemsProvider="LoadItems">
+                <tr ItemSummary @key=item.Id Details="@item.Summary">
+                    <td>@item.Id</td>
+                    <td>@item.Summary</td>
+                </tr>
+            </Virtualize>
+        </tbody>
+    </table>
+</div>
+
+@code {
+    private List<SampleItem> sampleItems = new();
+    private int TotalCount = 1000;
+
+    protected override async Task OnInitializedAsync()
+    {
+        sampleItems = await ListItems(0);
+    }
+
+    private async Task<List<SampleItem>> ListItems(int offset)
+    {
+        var newItems = new List<SampleItem>();
+
+        var i = offset;
+        while (i < TotalCount)
+        {
+            newItems.Add(new SampleItem(i));
+            // 以下をいれると1000秒経ってすべて返してからでないと UI 上表示されない
+            // await Task.Delay(TimeSpan.FromSeconds(1));
+            i++;
+        }
+
+        return newItems;
+    }
+
+    private async ValueTask<ItemsProviderResult<SampleItem>> LoadItems(ItemsProviderRequest request)
+    {
+        var items = await ListItems(request.StartIndex);
+        return new ItemsProviderResult<SampleItem>(items, TotalCount);
+    }
+}

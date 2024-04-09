@@ -1,0 +1,45 @@
+﻿@page "/load-all-primitive"
+@using VirtualizationSample.Models;
+
+<h3>LoadAllPrimitive</h3>
+
+<div style="height:500px;overflow-y:scroll">
+    <table>
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Summary</th>
+            </tr>
+        </thead>
+        <tbody>
+            <Virtualize Items="sampleItems" Context="item" ItemSize="25">
+                <tr ItemSummary @key="item.Id" Details="@item.Summary" />
+                <td>@item.Id</td>
+                <td>@item.Summary</td>
+            </Virtualize>
+        </tbody>
+    </table>
+</div>
+
+@code {
+    private List<SampleItem> sampleItems = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        sampleItems = ListItems();
+    }
+
+    private List<SampleItem> ListItems()
+    {
+        var newItems = new List<SampleItem>();
+
+        var i = 0;
+        while (i < 1000)
+        {
+            newItems.Add(new SampleItem(i));
+            i++;
+        }
+
+        return newItems;
+    }
+}
